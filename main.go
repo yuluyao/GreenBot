@@ -23,7 +23,7 @@ func main() {
 	//}
 
 	for i := 10; i < 20; i++ {
-		err := workOneDay(8)
+		err := workOneDay(i)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -46,7 +46,7 @@ func workOneDay(daysBefore int) (err error) {
 
 	commitTimes := rand.Intn(10) + 1
 
-	oneCommit := func() error {
+	oneCommit := func(index int) error {
 		// modify
 		_, err := botfile.WriteString(fmt.Sprintf("\n%d days ago", daysBefore))
 		if err != nil {
@@ -61,8 +61,9 @@ func workOneDay(daysBefore int) (err error) {
 			return err
 		}
 		// git commit
-		dateString := fmt.Sprintf("--date=format:relative:%d.days.ago", daysBefore)
-		prcCommit := exec.Command("git", "commit", "-m", "hello", dateString)
+		prcCommit := exec.Command("git", "commit", "-m",
+			fmt.Sprintf("%d days ago (%d)", daysBefore, index),
+			fmt.Sprintf("--date=format:relative:%d.days.ago", daysBefore))
 		err = prcCommit.Run()
 		if err != nil {
 			return err
@@ -71,7 +72,7 @@ func workOneDay(daysBefore int) (err error) {
 	}
 
 	for i := 0; i < commitTimes; i++ {
-		err = oneCommit()
+		err = oneCommit(i)
 		if err != nil {
 			return err
 		}
