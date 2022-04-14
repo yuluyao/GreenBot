@@ -22,11 +22,13 @@ func main() {
 	//	println(buffer.String())
 	//}
 
-	err := workOneDay(8)
-	if err != nil {
-		log.Fatalln(err)
+	for i := 10; i < 20; i++ {
+		err := workOneDay(8)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
-	println("success")
+	println("completed")
 }
 
 func workOneDay(daysBefore int) (err error) {
@@ -42,15 +44,15 @@ func workOneDay(daysBefore int) (err error) {
 
 	}
 
-	commitTimes := rand.Intn(5) + 1
+	commitTimes := rand.Intn(10) + 1
 
 	oneCommit := func() error {
 		// modify
-		effected, err := botfile.WriteString("hello\n")
+		_, err := botfile.WriteString(fmt.Sprintf("\n%d days ago", daysBefore))
 		if err != nil {
 			return err
 		}
-		println(effected)
+		//println(effected)
 
 		// git add
 		prcAdd := exec.Command("git", "add", ".")
