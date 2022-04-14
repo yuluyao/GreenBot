@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"os/exec"
 )
@@ -21,15 +22,14 @@ func main() {
 	//	println(buffer.String())
 	//}
 
-	err := createOne()
+	err := workOneDay(8)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	println("success")
 }
 
-// 修改一次，并add
-func createOne() (err error) {
+func workOneDay(daysBefore int) (err error) {
 	var botfile *os.File
 	info, err := os.Stat("botfile")
 	if err != nil {
@@ -42,25 +42,37 @@ func createOne() (err error) {
 
 	}
 
-	// modify
-	effected, err := botfile.WriteString("hello\n")
-	if err != nil {
-		return err
-	}
-	println(effected)
+	commitTimes := rand.Intn(5) + 1
 
-	// git add
-	prcAdd := exec.Command("git", "add", ".")
-	err = prcAdd.Run()
-	if err != nil {
-		return err
+	oneCommit := func() error {
+		// modify
+		effected, err := botfile.WriteString("hello\n")
+		if err != nil {
+			return err
+		}
+		println(effected)
+
+		// git add
+		prcAdd := exec.Command("git", "add", ".")
+		err = prcAdd.Run()
+		if err != nil {
+			return err
+		}
+		// git commit
+		dateString := fmt.Sprintf("--date=format:relative:%d.days.ago", daysBefore)
+		prcCommit := exec.Command("git", "commit", "-m", "hello", dateString)
+		err = prcCommit.Run()
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	// git commit
-	dateString := fmt.Sprintf("--date=format:relative:%d.days.ago", 4)
-	prcCommit := exec.Command("git", "commit", "-m", "hello", dateString)
-	err = prcCommit.Run()
-	if err != nil {
-		return err
+
+	for i := 0; i < commitTimes; i++ {
+		err = oneCommit()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
