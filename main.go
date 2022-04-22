@@ -72,7 +72,7 @@ func workOneDay(daysBefore int) (err error) {
 	}
 
 	for i := 0; i < commitTimes; i++ {
-		err = oneCommit(i)
+		err = oneCommit(i + 1)
 		if err != nil {
 			return err
 		}
