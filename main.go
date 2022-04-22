@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"time"
 )
 
 func main() {
@@ -21,8 +22,26 @@ func main() {
 	//if process.ProcessState.Success() {
 	//	println(buffer.String())
 	//}
+	startTime, err := time.ParseInLocation("2006-01-02 15:04:05", "2021-01-01 10:09:10", time.Local)
+	if err != nil {
+		return
+	}
+	endTime, err := time.ParseInLocation("2006-01-02 15:04:05", "2021-12-31 16:32:13", time.Local)
+	if err != nil {
+		return
+	}
+	now := time.Now()
 
-	for i := 10; i < 20; i++ {
+	startDay := int(now.Sub(startTime) / (time.Hour * 24))
+	endDay := int(now.Sub(endTime) / (time.Hour * 24))
+
+	//career := endTime.Sub(startTime)
+	//fmt.Printf("hours: %s\n", career.String())
+	//daysBetween := career / (time.Hour * 24)
+	//fmt.Printf("daysBetween: %d\n", startDay-endDay)
+
+	for i := startDay; i > endDay; i-- {
+		//println(i)
 		err := workOneDay(i)
 		if err != nil {
 			log.Fatalln(err)
@@ -44,7 +63,7 @@ func workOneDay(daysBefore int) (err error) {
 
 	}
 
-	commitTimes := rand.Intn(10) + 1
+	commitTimes := rand.Intn(15) + 1
 
 	oneCommit := func(index int) error {
 		// modify
