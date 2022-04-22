@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"math/rand"
@@ -12,16 +11,6 @@ import (
 
 func main() {
 
-	//buffer := bytes.NewBuffer([]byte{})
-	//process := exec.Command("git", "s")
-	//process.Stdout = buffer
-	//err2 := process.Run()
-	//if err2 != nil {
-	//	log.Fatalln(err2)
-	//}
-	//if process.ProcessState.Success() {
-	//	println(buffer.String())
-	//}
 	startTime, err := time.ParseInLocation("2006-01-02 15:04:05", "2021-01-01 10:09:10", time.Local)
 	if err != nil {
 		return
@@ -32,16 +21,10 @@ func main() {
 	}
 	now := time.Now()
 
-	startDay := int(now.Sub(startTime) / (time.Hour * 24))
-	endDay := int(now.Sub(endTime) / (time.Hour * 24))
+	daysAgoStart := int(now.Sub(startTime) / (time.Hour * 24))
+	daysAgoEnd := int(now.Sub(endTime) / (time.Hour * 24))
 
-	//career := endTime.Sub(startTime)
-	//fmt.Printf("hours: %s\n", career.String())
-	//daysBetween := career / (time.Hour * 24)
-	//fmt.Printf("daysBetween: %d\n", startDay-endDay)
-
-	for i := startDay; i > endDay; i-- {
-		//println(i)
+	for i := daysAgoStart; i > daysAgoEnd; i-- {
 		err := workOneDay(i)
 		if err != nil {
 			log.Fatalln(err)
@@ -50,7 +33,7 @@ func main() {
 	println("completed")
 }
 
-func workOneDay(daysBefore int) (err error) {
+func workOneDay(daysAgo int) (err error) {
 	var botfile *os.File
 	info, err := os.Stat("botfile")
 	if err != nil {
@@ -67,7 +50,7 @@ func workOneDay(daysBefore int) (err error) {
 
 	oneCommit := func(index int) error {
 		// modify
-		_, err := botfile.WriteString(fmt.Sprintf("\n%d days ago", daysBefore))
+		_, err := botfile.WriteString(fmt.Sprintf("\n%d days ago", daysAgo))
 		if err != nil {
 			return err
 		}
@@ -81,8 +64,8 @@ func workOneDay(daysBefore int) (err error) {
 		}
 		// git commit
 		prcCommit := exec.Command("git", "commit", "-m",
-			fmt.Sprintf("%d days ago (%d)", daysBefore, index),
-			fmt.Sprintf("--date=format:relative:%d.days.ago", daysBefore))
+			fmt.Sprintf("%d days ago (%d)", daysAgo, index),
+			fmt.Sprintf("--date=format:relative:%d.days.ago", daysAgo))
 		err = prcCommit.Run()
 		if err != nil {
 			return err
@@ -99,25 +82,3 @@ func workOneDay(daysBefore int) (err error) {
 
 	return nil
 }
-
-func commitOne(daysBefore int) {
-	stdOut := bytes.NewBuffer([]byte{})
-	dateString := fmt.Sprintf("--date=format:relative:%d.days.ago", daysBefore)
-	p1 := exec.Cmd{
-		Path:   "/usr/bin/git",
-		Args:   []string{"/usr/bin/git", "commit", "-m", "hello", dateString},
-		Stdout: stdOut,
-	}
-	err := p1.Run()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if p1.ProcessState.Success() {
-		println(stdOut.String())
-
-	}
-}
-
-// modify file
-// exec add
-// exec commit
